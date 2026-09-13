@@ -55,4 +55,19 @@ public class PlayerJoinListener implements Listener {
             }, 1L);
         }
     }
+
+    public void updatePlayerVisibility(String targetName, boolean isHidden) {
+        Player target = Bukkit.getPlayerExact(targetName);
+        if (target == null || !target.isOnline()) {
+            return; // they're not on right now, it'll apply when they log on.
+        }
+
+        for (Player viewer : Bukkit.getOnlinePlayers()) {
+            if (isHidden) {
+                viewer.unlistPlayer(target);
+            } else {
+                viewer.listPlayer(target);
+            }
+        }
+    }
 }

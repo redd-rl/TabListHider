@@ -1,26 +1,64 @@
 package redd_rl.tabListHider;
 
 import com.moandjiezana.toml.Toml;
+import com.moandjiezana.toml.TomlWriter;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public final class TabListHider extends JavaPlugin {
 
     // TabListHider.HIDDEN_PLAYERS
     public static List<String> HIDDEN_PLAYERS = new ArrayList<>();
+    private PlayerJoinListener listener;
 
     @Override
     public void onEnable() {
+        // load the list
         loadHiddenPlayers();
 
-        getServer().getPluginManager().registerEvents(new PlayerJoinListener(this), this);
+        this.listener = new PlayerJoinListener(this);
+
+        // hook join events
+        getServer().getPluginManager().registerEvents(this.listener, this);
+
+        // create the commands necessary.
+        TabListHiderCommand cmd = new TabListHiderCommand(this);
+        getCommand("tablisthider").setExecutor(cmd);
+        getCommand("tablisthider").setTabCompleter(cmd);
     }
 
-    private void loadHiddenPlayers() {
+    public PlayerJoinListener getListener() {
+        return listener;
+    }
+
+    public void saveHiddenPlayers() {
+        if (!getDataFolder().exists()) {
+            getDataFolder().mkdirs();
+        }
+
+        File configFile = new File(getDataFolder(), "config.toml");
+
+        // Construct the TOML data structure
+        Map<String, Object> data = new HashMap<>();
+        data.put("hidden_players", HIDDEN_PLAYERS != null ? HIDDEN_PLAYERS : new ArrayList<>());
+
+        TomlWriter writer = new TomlWriter();
+        try {
+            writer.write(data, configFile);
+            getLogger().info("Successfully saved " + (HIDDEN_PLAYERS != null ? HIDDEN_PLAYERS.size() : 0) + " hidden players to config.toml.");
+        } catch (IOException e) {
+            getLogger().severe("Failed to write hidden_players to config.toml!");
+            e.printStackTrace();
+        }
+    }
+
+    public void loadHiddenPlayers() {
         if (!getDataFolder().exists()) {
             getDataFolder().mkdirs();
         }
@@ -53,5 +91,7 @@ public final class TabListHider extends JavaPlugin {
     }
 
     @Override
-    public void onDisable() {}
+    public void onDisable() {
+        saveHiddenPlayers();
+    }
 }

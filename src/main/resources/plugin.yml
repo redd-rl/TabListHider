@@ -11,3 +11,10 @@ libraries:
 
 authors: [ redd_rl ]
 website: https://www.redd-rl.com/tab-list-hider
+
+commands:
+  tablisthider:
+    description: Add or remove hidden players from the tablist.
+    permission: tablisthider.admin
+    usage: /tablisthider <add|remove|list|reload|save> [player]
+    aliases: [th]
