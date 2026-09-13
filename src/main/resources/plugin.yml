@@ -1,0 +1,13 @@
+name: TabListHider
+description: $description
+prefix: "[TabListHider]"
+version: '${version}'
+
+main: redd_rl.tabListHider.TabListHider
+api-version: '26.2'
+load: POSTWORLD
+libraries:
+  - "com.moandjiezana.toml:toml4j:0.7.2"
+
+authors: [ redd_rl ]
+website: https://www.redd-rl.com/tab-list-hider
