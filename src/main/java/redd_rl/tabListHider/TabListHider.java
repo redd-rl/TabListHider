@@ -2,6 +2,8 @@ package redd_rl.tabListHider;
 
 import com.moandjiezana.toml.Toml;
 import com.moandjiezana.toml.TomlWriter;
+import org.bstats.bukkit.Metrics;
+import org.bstats.charts.SingleLineChart;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -19,9 +21,19 @@ public final class TabListHider extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        // METRICS!!
+        int pluginId = 34068;
+        Metrics metrics = new Metrics(this, pluginId);
+
         // load the list
         loadHiddenPlayers();
 
+        metrics.addCustomChart(new SingleLineChart("total_hidden_players", () -> {
+            return (int) HIDDEN_PLAYERS.stream()
+                    .filter(name -> !name.equalsIgnoreCase("Herobrine")) // default values we can go without!
+                    .filter(name -> !name.equalsIgnoreCase("Notch"))
+                    .count();
+        }));
         this.listener = new PlayerJoinListener(this);
 
         // hook join events
